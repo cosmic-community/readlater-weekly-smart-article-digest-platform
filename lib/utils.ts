@@ -23,6 +23,8 @@ export function formatTime(timeString: string): string {
 
 export function extractDomain(url: string): string {
   try {
+    // Fix: Add null check for url parameter
+    if (!url) return '';
     const domain = new URL(url).hostname;
     return domain.replace('www.', '');
   } catch {
@@ -39,6 +41,12 @@ export function generateWeekBatch(date: Date = new Date()): string {
 }
 
 export function getWeekStartEnd(weekBatch: string): { start: Date; end: Date } {
+  // Fix: Add null check for weekBatch parameter
+  if (!weekBatch) {
+    const now = new Date();
+    return { start: now, end: now };
+  }
+  
   const [year, week] = weekBatch.split('-W');
   const yearNum = parseInt(year);
   const weekNum = parseInt(week);
@@ -161,6 +169,9 @@ export function getUnreadCount(articles: any[]): number {
 }
 
 export function formatWeekRange(weekBatch: string): string {
+  // Fix: Add null check for weekBatch parameter
+  if (!weekBatch) return '';
+  
   const { start, end } = getWeekStartEnd(weekBatch);
   return `${start.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - ${end.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`;
 }
