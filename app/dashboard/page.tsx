@@ -1,17 +1,53 @@
-import { Suspense } from 'react';
+'use client';
+
+import { useState, useEffect, Suspense } from 'react';
 import { getUsers, getSavedArticles, getWeeklyDigests } from '@/lib/cosmic';
+import { User, SavedArticle, WeeklyDigest } from '@/types';
 import DashboardHeader from '@/components/DashboardHeader';
 import DashboardStats from '@/components/DashboardStats';
 import ArticleList from '@/components/ArticleList';
 import AddArticleForm from '@/components/AddArticleForm';
 import LoadingSpinner from '@/components/LoadingSpinner';
 
-export default async function DashboardPage() {
-  const [users, savedArticles, weeklyDigests] = await Promise.all([
-    getUsers(),
-    getSavedArticles(),
-    getWeeklyDigests()
-  ]);
+export default function DashboardPage() {
+  const [users, setUsers] = useState<User[]>([]);
+  const [savedArticles, setSavedArticles] = useState<SavedArticle[]>([]);
+  const [weeklyDigests, setWeeklyDigests] = useState<WeeklyDigest[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const [usersData, articlesData, digestsData] = await Promise.all([
+          getUsers(),
+          getSavedArticles(),
+          getWeeklyDigests()
+        ]);
+        setUsers(usersData);
+        setSavedArticles(articlesData);
+        setWeeklyDigests(digestsData);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchData();
+  }, []);
+
+  const handleAddArticle = async (url: string) => {
+    // TODO: Implement add article functionality
+    console.log('Adding article:', url);
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <LoadingSpinner />
+      </div>
+    );
+  }
 
   const currentUser = users[0]; // For demo purposes, use first user
   const userArticles = savedArticles.filter(article => 
@@ -46,7 +82,7 @@ export default async function DashboardPage() {
           
           {/* Sidebar */}
           <div className="space-y-6">
-            <AddArticleForm userId={currentUser?.id} />
+            <AddArticleForm onSubmit={handleAddArticle} />
             
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Stats</h3>
