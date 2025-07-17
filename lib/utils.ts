@@ -15,8 +15,17 @@ export function formatDate(dateString: string): string {
 
 export function formatTime(timeString: string | undefined): string {
   if (!timeString || typeof timeString !== 'string') return '';
-  const [hours, minutes] = timeString.split(':');
-  const hour = parseInt(hours);
+  const timeParts = timeString.split(':');
+  if (timeParts.length !== 2) return '';
+  
+  const hours = timeParts[0];
+  const minutes = timeParts[1];
+  
+  if (!hours || !minutes) return '';
+  
+  const hour = parseInt(hours, 10);
+  if (isNaN(hour)) return '';
+  
   const ampm = hour >= 12 ? 'PM' : 'AM';
   const displayHour = hour % 12 || 12;
   return `${displayHour}:${minutes} ${ampm}`;
@@ -46,14 +55,25 @@ export function getWeekStartEnd(weekBatch: string): { start: Date; end: Date } {
     return { start: now, end: now };
   }
   
-  const [year, week] = weekBatch.split('-W');
+  const parts = weekBatch.split('-W');
+  if (parts.length !== 2) {
+    const now = new Date();
+    return { start: now, end: now };
+  }
+  
+  const [year, week] = parts;
   if (!year || !week) {
     const now = new Date();
     return { start: now, end: now };
   }
   
-  const yearNum = parseInt(year);
-  const weekNum = parseInt(week);
+  const yearNum = parseInt(year, 10);
+  const weekNum = parseInt(week, 10);
+  
+  if (isNaN(yearNum) || isNaN(weekNum)) {
+    const now = new Date();
+    return { start: now, end: now };
+  }
   
   const start = new Date(yearNum, 0, 1 + (weekNum - 1) * 7);
   const end = new Date(start);
@@ -63,20 +83,24 @@ export function getWeekStartEnd(weekBatch: string): { start: Date; end: Date } {
 }
 
 export function truncateText(text: string, length: number): string {
+  if (!text) return '';
   if (text.length <= length) return text;
   return text.substring(0, length) + '...';
 }
 
 export function capitalizeFirst(str: string): string {
+  if (!str) return '';
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
 export function validateEmail(email: string): boolean {
+  if (!email) return false;
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   return emailRegex.test(email);
 }
 
 export function validateUrl(url: string): boolean {
+  if (!url) return false;
   try {
     new URL(url);
     return true;
@@ -91,6 +115,7 @@ export function getTagColor(color?: string): string {
 }
 
 export function getReadingTime(text: string): number {
+  if (!text) return 0;
   const wordsPerMinute = 200;
   const words = text.split(' ').length;
   return Math.ceil(words / wordsPerMinute);
@@ -113,6 +138,7 @@ export function getTimezoneOffset(timezone: string): number {
 }
 
 export function isValidTime(time: string): boolean {
+  if (!time) return false;
   const timeRegex = /^([01]?[0-9]|2[0-3]):[0-5][0-9]$/;
   return timeRegex.test(time);
 }
@@ -131,20 +157,23 @@ export function getDayOfWeek(day: string): number {
 }
 
 export function sortArticlesByDate(articles: any[]): any[] {
+  if (!articles || !Array.isArray(articles)) return [];
   return articles.sort((a, b) => {
-    const dateA = new Date(a.metadata.saved_date);
-    const dateB = new Date(b.metadata.saved_date);
+    const dateA = new Date(a.metadata?.saved_date || 0);
+    const dateB = new Date(b.metadata?.saved_date || 0);
     return dateB.getTime() - dateA.getTime();
   });
 }
 
 export function groupArticlesByTag(articles: any[]): Record<string, any[]> {
+  if (!articles || !Array.isArray(articles)) return {};
+  
   const grouped: Record<string, any[]> = {};
   
   articles.forEach(article => {
-    if (article.metadata.tags && article.metadata.tags.length > 0) {
+    if (article.metadata?.tags && Array.isArray(article.metadata.tags) && article.metadata.tags.length > 0) {
       article.metadata.tags.forEach((tag: any) => {
-        const tagName = tag.metadata?.tag_name || tag.title;
+        const tagName = tag.metadata?.tag_name || tag.title || 'Unknown';
         if (!grouped[tagName]) {
           grouped[tagName] = [];
         }
@@ -162,13 +191,15 @@ export function groupArticlesByTag(articles: any[]): Record<string, any[]> {
 }
 
 export function getArticleCount(articles: any[]): number {
+  if (!articles || !Array.isArray(articles)) return 0;
   return articles.length;
 }
 
 export function getUnreadCount(articles: any[]): number {
+  if (!articles || !Array.isArray(articles)) return 0;
   return articles.filter(article => 
-    article.metadata.read_status?.key === 'unread' || 
-    article.metadata.read_status?.value === 'Unread'
+    article.metadata?.read_status?.key === 'unread' || 
+    article.metadata?.read_status?.value === 'Unread'
   ).length;
 }
 
