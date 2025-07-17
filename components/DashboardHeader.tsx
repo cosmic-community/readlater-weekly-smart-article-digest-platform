@@ -1,3 +1,5 @@
+'use client';
+
 import { User } from '@/types';
 import { Bell, Settings, User as UserIcon, LogOut } from 'lucide-react';
 

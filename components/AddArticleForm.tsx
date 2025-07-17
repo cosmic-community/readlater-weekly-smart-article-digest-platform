@@ -3,16 +3,12 @@
 import { useState } from 'react';
 import { validateUrl } from '@/lib/utils';
 
-interface AddArticleFormProps {
-  onSubmit: (url: string) => void;
-  isLoading?: boolean;
-}
-
-export default function AddArticleForm({ onSubmit, isLoading = false }: AddArticleFormProps) {
+export default function AddArticleForm() {
   const [url, setUrl] = useState('');
   const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
 
@@ -26,8 +22,27 @@ export default function AddArticleForm({ onSubmit, isLoading = false }: AddArtic
       return;
     }
 
-    onSubmit(url.trim());
-    setUrl('');
+    setIsLoading(true);
+    
+    try {
+      // TODO: Implement API call to add article
+      console.log('Adding article:', url.trim());
+      
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Clear form on success
+      setUrl('');
+      
+      // Show success message or redirect
+      alert('Article added successfully!');
+      
+    } catch (error) {
+      console.error('Error adding article:', error);
+      setError('Failed to add article. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (

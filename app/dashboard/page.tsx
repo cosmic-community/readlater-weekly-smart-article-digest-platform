@@ -5,7 +5,6 @@ import DashboardHeader from '@/components/DashboardHeader';
 import DashboardStats from '@/components/DashboardStats';
 import ArticleList from '@/components/ArticleList';
 import AddArticleForm from '@/components/AddArticleForm';
-import LoadingSpinner from '@/components/LoadingSpinner';
 
 export default async function DashboardPage() {
   const user = await getCurrentUser();
@@ -18,12 +17,6 @@ export default async function DashboardPage() {
     getSavedArticlesByUser(user.id),
     getWeeklyDigestsByUser(user.id)
   ]);
-
-  const handleAddArticle = async (url: string) => {
-    'use server';
-    // TODO: Implement add article functionality
-    console.log('Adding article:', url);
-  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -51,7 +44,7 @@ export default async function DashboardPage() {
           
           {/* Sidebar */}
           <div className="space-y-6">
-            <AddArticleForm onSubmit={handleAddArticle} />
+            <AddArticleForm />
             
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Stats</h3>
