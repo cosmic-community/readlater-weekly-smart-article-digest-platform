@@ -37,27 +37,27 @@ export default function DashboardHeader({ user }: DashboardHeaderProps) {
             <h1 className="text-2xl font-bold text-gray-900">
               Welcome back, {user.metadata.full_name}
             </h1>
-            <p className="text-gray-600">
+            <p className="text-gray-600 font-medium">
               {user.metadata.subscription_tier?.value || 'Free'} Plan • 
               Digest on {user.metadata.digest_day?.value || 'Friday'}s at {user.metadata.digest_time || '17:00'}
             </p>
           </div>
           
           <div className="flex items-center space-x-4">
-            <button className="btn btn-ghost btn-sm">
-              <Bell className="w-4 h-4" />
+            <button className="btn btn-ghost btn-sm p-2 hover:bg-gray-100">
+              <Bell className="w-5 h-5 text-gray-600" />
             </button>
-            <button className="btn btn-ghost btn-sm">
-              <Settings className="w-4 h-4" />
+            <button className="btn btn-ghost btn-sm p-2 hover:bg-gray-100">
+              <Settings className="w-5 h-5 text-gray-600" />
             </button>
-            <button className="btn btn-ghost btn-sm">
-              <UserIcon className="w-4 h-4" />
+            <button className="btn btn-ghost btn-sm p-2 hover:bg-gray-100">
+              <UserIcon className="w-5 h-5 text-gray-600" />
             </button>
             <button 
               onClick={handleLogout}
-              className="btn btn-ghost btn-sm text-red-600 hover:text-red-700"
+              className="btn btn-ghost btn-sm p-2 text-red-600 hover:text-red-700 hover:bg-red-50"
             >
-              <LogOut className="w-4 h-4" />
+              <LogOut className="w-5 h-5" />
             </button>
           </div>
         </div>
