@@ -69,13 +69,18 @@ export async function POST(request: NextRequest) {
     // Create session
     await createUserSession(user.id);
 
+    // Handle subscription tier properly - could be string or object
+    const subscriptionTierValue = typeof user.metadata.subscription_tier === 'string' 
+      ? user.metadata.subscription_tier 
+      : user.metadata.subscription_tier?.value || 'Free';
+
     return NextResponse.json({
       success: true,
       user: {
         id: user.id,
         email: user.metadata.email,
         fullName: user.metadata.full_name,
-        subscriptionTier: user.metadata.subscription_tier?.value || user.metadata.subscription_tier
+        subscriptionTier: subscriptionTierValue
       }
     });
   } catch (error) {

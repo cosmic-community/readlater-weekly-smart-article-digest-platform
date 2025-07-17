@@ -15,13 +15,25 @@ export default async function DashboardPage() {
 
   const savedArticles = await getSavedArticles(user.id);
 
+  // Helper function to get the value from string or object
+  const getSelectDropdownValue = (field: string | { key: string; value: string }) => {
+    return typeof field === 'string' ? field : field?.value || '';
+  };
+
+  // Create a properly typed subscription tier object
+  const subscriptionTierValue = getSelectDropdownValue(user.metadata.subscription_tier);
+  const subscriptionTier = {
+    key: typeof user.metadata.subscription_tier === 'object' ? user.metadata.subscription_tier.key : subscriptionTierValue.toLowerCase(),
+    value: subscriptionTierValue
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       <DashboardHeader user={{
         id: user.id,
         email: user.metadata.email,
         fullName: user.metadata.full_name,
-        subscriptionTier: user.metadata.subscription_tier
+        subscriptionTier: subscriptionTier
       }} />
       
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">

@@ -72,9 +72,9 @@ export async function getUserByEmail(email: string): Promise<User | null> {
       return response.objects[0] as User;
     }
     return null;
-  } catch (error) {
-    // If 404, no user found - return null
-    if (error.status === 404) {
+  } catch (error: unknown) {
+    // Handle the error as unknown type and check for status
+    if (error && typeof error === 'object' && 'status' in error && error.status === 404) {
       return null;
     }
     console.error('Error fetching user by email:', error);
@@ -112,7 +112,7 @@ export async function createUser(userData: {
     });
     
     return response.object as User;
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error creating user:', error);
     throw new Error('Failed to create user');
   }
@@ -127,7 +127,7 @@ export async function authenticateUser(email: string, password: string): Promise
     if (!isValid) return null;
 
     return user;
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error authenticating user:', error);
     return null;
   }

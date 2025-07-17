@@ -23,8 +23,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Check if account is active
-    if (user.metadata.account_status?.key !== 'active') {
+    // Check if account is active - handle both string and object types
+    const accountStatus = user.metadata.account_status;
+    const statusKey = typeof accountStatus === 'string' ? accountStatus : accountStatus?.key;
+    
+    if (statusKey !== 'active') {
       return NextResponse.json(
         { error: 'Account is not active' },
         { status: 401 }
