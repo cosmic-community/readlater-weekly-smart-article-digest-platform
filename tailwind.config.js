@@ -20,7 +20,20 @@ module.exports = {
           700: '#1D4ED8',
           800: '#1E40AF',
           900: '#1E3A8A',
+          foreground: '#FFFFFF',
         },
+        secondary: {
+          DEFAULT: '#9CA3AF',
+          foreground: '#111827',
+        },
+        background: '#FFFFFF',
+        foreground: '#111827',
+        muted: {
+          DEFAULT: '#F9FAFB',
+          foreground: '#6B7280',
+        },
+        border: '#E5E7EB',
+        ring: '#3B82F6',
         gray: {
           50: '#F9FAFB',
           100: '#F3F4F6',
