@@ -121,3 +121,22 @@ export interface WeeklyDigest {
     };
   };
 }
+
+// Add missing constants for SignupForm
+export const DIGEST_DAYS = [
+  'Monday',
+  'Tuesday', 
+  'Wednesday',
+  'Thursday',
+  'Friday',
+  'Saturday',
+  'Sunday'
+] as const;
+
+export const TIMEZONES = [
+  'UTC',
+  'Eastern (EST)',
+  'Central (CST)',
+  'Mountain (MST)',
+  'Pacific (PST)'
+] as const;

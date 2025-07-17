@@ -7,6 +7,9 @@ const cosmic = createBucketClient({
   writeKey: process.env.COSMIC_WRITE_KEY as string,
 });
 
+// Export the cosmic client for use in other files
+export { cosmic };
+
 export async function getSavedArticles(userId?: string): Promise<SavedArticle[]> {
   try {
     const query = userId 
@@ -34,6 +37,21 @@ export async function getSavedArticle(slug: string): Promise<SavedArticle | null
     return response.object as SavedArticle;
   } catch (error) {
     console.error('Error fetching saved article:', error);
+    return null;
+  }
+}
+
+// Add the missing getSavedArticleBySlug function
+export async function getSavedArticleBySlug(slug: string): Promise<SavedArticle | null> {
+  try {
+    const response = await cosmic.objects.findOne({
+      type: 'saved-articles',
+      slug: slug
+    }).depth(1);
+    
+    return response.object as SavedArticle;
+  } catch (error) {
+    console.error('Error fetching saved article by slug:', error);
     return null;
   }
 }

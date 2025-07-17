@@ -1,12 +1,11 @@
-import { SavedArticle, WeeklyDigest } from '@/types';
+import { SavedArticle } from '@/types';
 import { BookOpen, Mail, Clock, TrendingUp } from 'lucide-react';
 
 interface DashboardStatsProps {
   articles: SavedArticle[];
-  weeklyDigests: WeeklyDigest[];
 }
 
-export default function DashboardStats({ articles, weeklyDigests }: DashboardStatsProps) {
+export default function DashboardStats({ articles }: DashboardStatsProps) {
   const unreadCount = articles.filter(article => 
     article.metadata.read_status?.key === 'unread'
   ).length;
@@ -40,7 +39,7 @@ export default function DashboardStats({ articles, weeklyDigests }: DashboardSta
     },
     {
       title: 'Digests Sent',
-      value: weeklyDigests.length,
+      value: 0, // Default to 0 since weekly digests aren't implemented yet
       icon: Mail,
       color: 'text-purple-600',
       bgColor: 'bg-purple-100'

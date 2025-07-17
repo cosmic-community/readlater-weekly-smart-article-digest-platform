@@ -231,7 +231,7 @@ export default function SignupForm() {
             onChange={handleChange}
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary sm:text-sm"
           >
-            {DIGEST_DAYS.map(day => (
+            {DIGEST_DAYS.map((day: string) => (
               <option key={day} value={day}>{day}</option>
             ))}
           </select>
@@ -263,7 +263,7 @@ export default function SignupForm() {
           onChange={handleChange}
           className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary sm:text-sm"
         >
-          {TIMEZONES.map(tz => (
+          {TIMEZONES.map((tz: string) => (
             <option key={tz} value={tz}>{tz}</option>
           ))}
         </select>
