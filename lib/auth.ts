@@ -68,10 +68,17 @@ export async function getUserByEmail(email: string): Promise<User | null> {
       'metadata.email': email
     }).depth(1);
     
-    return response.objects[0] as User || null;
-  } catch (error) {
-    console.error('Error fetching user by email:', error);
+    if (response.objects && response.objects.length > 0) {
+      return response.objects[0] as User;
+    }
     return null;
+  } catch (error) {
+    // If 404, no user found - return null
+    if (error.status === 404) {
+      return null;
+    }
+    console.error('Error fetching user by email:', error);
+    throw error;
   }
 }
 
@@ -112,11 +119,16 @@ export async function createUser(userData: {
 }
 
 export async function authenticateUser(email: string, password: string): Promise<User | null> {
-  const user = await getUserByEmail(email);
-  if (!user) return null;
+  try {
+    const user = await getUserByEmail(email);
+    if (!user || !user.metadata.password) return null;
 
-  const isValid = await verifyPassword(password, user.metadata.password);
-  if (!isValid) return null;
+    const isValid = await verifyPassword(password, user.metadata.password);
+    if (!isValid) return null;
 
-  return user;
+    return user;
+  } catch (error) {
+    console.error('Error authenticating user:', error);
+    return null;
+  }
 }

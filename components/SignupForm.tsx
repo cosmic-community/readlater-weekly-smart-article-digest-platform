@@ -3,7 +3,9 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Eye, EyeOff, Mail, Lock, User, AlertCircle, CheckCircle } from 'lucide-react';
-import { DIGEST_DAYS, TIMEZONES } from '@/types';
+
+const DIGEST_DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+const TIMEZONES = ['UTC', 'Eastern (EST)', 'Central (CST)', 'Mountain (MST)', 'Pacific (PST)'];
 
 export default function SignupForm() {
   const [formData, setFormData] = useState({
@@ -44,6 +46,14 @@ export default function SignupForm() {
       return;
     }
 
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      setError('Please enter a valid email address');
+      setLoading(false);
+      return;
+    }
+
     try {
       const response = await fetch('/api/auth/signup', {
         method: 'POST',
@@ -77,7 +87,8 @@ export default function SignupForm() {
         router.refresh();
       }, 1500);
     } catch (err) {
-      setError('An error occurred during signup');
+      console.error('Signup error:', err);
+      setError('An error occurred during signup. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -122,7 +133,7 @@ export default function SignupForm() {
             required
             value={formData.fullName}
             onChange={handleChange}
-            className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm"
+            className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
             placeholder="Enter your full name"
           />
         </div>
@@ -144,7 +155,7 @@ export default function SignupForm() {
             required
             value={formData.email}
             onChange={handleChange}
-            className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm"
+            className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
             placeholder="Enter your email"
           />
         </div>
@@ -166,7 +177,7 @@ export default function SignupForm() {
             required
             value={formData.password}
             onChange={handleChange}
-            className="block w-full pl-10 pr-10 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm"
+            className="block w-full pl-10 pr-10 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
             placeholder="Enter your password"
           />
           <button
@@ -202,7 +213,7 @@ export default function SignupForm() {
             required
             value={formData.confirmPassword}
             onChange={handleChange}
-            className="block w-full pl-10 pr-10 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm"
+            className="block w-full pl-10 pr-10 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
             placeholder="Confirm your password"
           />
           <button
@@ -229,7 +240,7 @@ export default function SignupForm() {
             name="digestDay"
             value={formData.digestDay}
             onChange={handleChange}
-            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary sm:text-sm"
+            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
           >
             {DIGEST_DAYS.map((day: string) => (
               <option key={day} value={day}>{day}</option>
@@ -247,7 +258,7 @@ export default function SignupForm() {
             type="time"
             value={formData.digestTime}
             onChange={handleChange}
-            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary sm:text-sm"
+            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
           />
         </div>
       </div>
@@ -261,7 +272,7 @@ export default function SignupForm() {
           name="timezone"
           value={formData.timezone}
           onChange={handleChange}
-          className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary sm:text-sm"
+          className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
         >
           {TIMEZONES.map((tz: string) => (
             <option key={tz} value={tz}>{tz}</option>
@@ -276,7 +287,7 @@ export default function SignupForm() {
           type="checkbox"
           checked={formData.emailNotifications}
           onChange={handleChange}
-          className="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
+          className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
         />
         <label htmlFor="emailNotifications" className="ml-2 block text-sm text-gray-900">
           I want to receive email notifications and weekly digests
@@ -287,7 +298,7 @@ export default function SignupForm() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {loading ? 'Creating account...' : 'Create account'}
         </button>

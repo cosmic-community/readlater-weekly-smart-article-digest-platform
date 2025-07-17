@@ -1,4 +1,4 @@
-export interface User {
+export interface CosmicObject {
   id: string;
   slug: string;
   title: string;
@@ -7,52 +7,26 @@ export interface User {
   created_at: string;
   modified_at: string;
   status: string;
-  thumbnail: string;
   published_at: string;
-  modified_by: string;
-  created_by: string;
-  publish_at: string | null;
   type: string;
+  metadata: any;
+}
+
+export interface User extends CosmicObject {
   metadata: {
     email: string;
     password: string;
     full_name: string;
-    subscription_tier: {
-      key: string;
-      value: string;
-    };
-    digest_day: {
-      key: string;
-      value: string;
-    };
+    subscription_tier: string | { key: string; value: string };
+    digest_day: string | { key: string; value: string };
     digest_time: string;
-    timezone: {
-      key: string;
-      value: string;
-    };
+    timezone: string | { key: string; value: string };
     email_notifications: boolean;
-    account_status: {
-      key: string;
-      value: string;
-    };
+    account_status: string | { key: string; value: string };
   };
 }
 
-export interface Tag {
-  id: string;
-  slug: string;
-  title: string;
-  metadata: {
-    tag_name: string;
-    color: string;
-    description: string;
-  };
-}
-
-export interface SavedArticle {
-  id: string;
-  slug: string;
-  title: string;
+export interface SavedArticle extends CosmicObject {
   metadata: {
     url: string;
     title: string;
@@ -64,19 +38,21 @@ export interface SavedArticle {
     domain: string;
     user: User;
     tags: Tag[];
-    read_status: {
-      key: string;
-      value: string;
-    };
+    read_status: { key: string; value: string };
     saved_date: string;
     week_batch: string;
   };
 }
 
-export interface SubscriptionPlan {
-  id: string;
-  slug: string;
-  title: string;
+export interface Tag extends CosmicObject {
+  metadata: {
+    tag_name: string;
+    color: string;
+    description: string;
+  };
+}
+
+export interface SubscriptionPlan extends CosmicObject {
   metadata: {
     plan_name: string;
     monthly_price: number;
@@ -87,26 +63,18 @@ export interface SubscriptionPlan {
   };
 }
 
-export interface EmailTemplate {
-  id: string;
-  slug: string;
-  title: string;
+export interface EmailTemplate extends CosmicObject {
   metadata: {
     template_name: string;
     subject_line: string;
     html_content: string;
     plain_text_content: string;
-    subscription_tier: {
-      key: string;
-      value: string;
-    };
+    subscription_tier: { key: string; value: string };
     active_status: boolean;
   };
 }
 
-export interface WeeklyDigest {
-  id: string;
-  title: string;
+export interface WeeklyDigest extends CosmicObject {
   metadata: {
     user: User;
     week_start_date: string;
@@ -115,28 +83,9 @@ export interface WeeklyDigest {
     sent_date: string;
     email_opened: boolean;
     click_count: number;
-    digest_status: {
-      key: string;
-      value: string;
-    };
+    digest_status: { key: string; value: string };
   };
 }
 
-// Add missing constants for SignupForm
-export const DIGEST_DAYS = [
-  'Monday',
-  'Tuesday', 
-  'Wednesday',
-  'Thursday',
-  'Friday',
-  'Saturday',
-  'Sunday'
-] as const;
-
-export const TIMEZONES = [
-  'UTC',
-  'Eastern (EST)',
-  'Central (CST)',
-  'Mountain (MST)',
-  'Pacific (PST)'
-] as const;
+export const DIGEST_DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+export const TIMEZONES = ['UTC', 'Eastern (EST)', 'Central (CST)', 'Mountain (MST)', 'Pacific (PST)'];
