@@ -1,10 +1,10 @@
-import { redirect } from 'next/navigation';
 import { getCurrentUser } from '@/lib/auth';
-import { getSavedArticlesByUser, getWeeklyDigestsByUser } from '@/lib/cosmic';
+import { getSavedArticles } from '@/lib/cosmic';
 import DashboardHeader from '@/components/DashboardHeader';
 import DashboardStats from '@/components/DashboardStats';
-import ArticleList from '@/components/ArticleList';
+import RecentArticles from '@/components/RecentArticles';
 import AddArticleForm from '@/components/AddArticleForm';
+import { redirect } from 'next/navigation';
 
 export default async function DashboardPage() {
   const user = await getCurrentUser();
@@ -13,59 +13,38 @@ export default async function DashboardPage() {
     redirect('/auth/login');
   }
 
-  const [savedArticles, weeklyDigests] = await Promise.all([
-    getSavedArticlesByUser(user.id),
-    getWeeklyDigestsByUser(user.id)
-  ]);
+  const savedArticles = await getSavedArticles(user.id);
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <DashboardHeader user={user} />
+      <DashboardHeader user={{
+        id: user.id,
+        email: user.metadata.email,
+        fullName: user.metadata.full_name,
+        subscriptionTier: user.metadata.subscription_tier
+      }} />
       
-      <div className="max-w-7xl mx-auto container-padding py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-          {/* Main Content */}
-          <div className="lg:col-span-3 space-y-8">
-            <DashboardStats 
-              articles={savedArticles}
-              weeklyDigests={weeklyDigests}
-            />
-            
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-              <div className="p-6 border-b border-gray-200">
-                <h2 className="text-xl font-semibold text-gray-900">Your Saved Articles</h2>
-                <p className="text-gray-600 mt-1">
-                  {savedArticles.length} articles saved • {savedArticles.filter(a => a.metadata.read_status?.key === 'unread').length} unread
-                </p>
-              </div>
-              <ArticleList articles={savedArticles} />
-            </div>
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="mb-8">
+          <h1 className="text-2xl font-bold text-gray-900">
+            Welcome back, {user.metadata.full_name}
+          </h1>
+          <p className="text-gray-600">
+            Manage your saved articles and reading digest
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="lg:col-span-2">
+            <DashboardStats articles={savedArticles} />
+            <RecentArticles articles={savedArticles} />
           </div>
           
-          {/* Sidebar */}
-          <div className="space-y-6">
-            <AddArticleForm />
-            
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Stats</h3>
-              <div className="space-y-3">
-                <div className="flex justify-between">
-                  <span className="text-gray-600">This Week</span>
-                  <span className="font-semibold">{savedArticles.filter(a => a.metadata.week_batch === `${new Date().getFullYear()}-W${Math.ceil(new Date().getDate() / 7)}`).length}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Unread</span>
-                  <span className="font-semibold text-primary">{savedArticles.filter(a => a.metadata.read_status?.key === 'unread').length}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Total</span>
-                  <span className="font-semibold">{savedArticles.length}</span>
-                </div>
-              </div>
-            </div>
+          <div className="lg:col-span-1">
+            <AddArticleForm userId={user.id} />
           </div>
         </div>
-      </div>
+      </main>
     </div>
   );
 }
