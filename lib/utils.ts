@@ -24,7 +24,7 @@ export function formatTime(timeString: string): string {
 
 export function extractDomain(url: string): string {
   try {
-    if (!url) return '';
+    if (!url || typeof url !== 'string') return '';
     const domain = new URL(url).hostname;
     return domain.replace('www.', '');
   } catch {
@@ -200,7 +200,7 @@ export function throttle<T extends (...args: any[]) => void>(
   limit: number
 ): (...args: Parameters<T>) => void {
   let inThrottle: boolean;
-  return (...args: Parameters<T>) => {
+  return (...args: Parameters<T>) => void {
     if (!inThrottle) {
       func(...args);
       inThrottle = true;
