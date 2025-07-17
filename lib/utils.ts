@@ -13,8 +13,8 @@ export function formatDate(dateString: string): string {
   });
 }
 
-export function formatTime(timeString: string): string {
-  if (!timeString) return '';
+export function formatTime(timeString: string | undefined): string {
+  if (!timeString || typeof timeString !== 'string') return '';
   const [hours, minutes] = timeString.split(':');
   const hour = parseInt(hours);
   const ampm = hour >= 12 ? 'PM' : 'AM';
