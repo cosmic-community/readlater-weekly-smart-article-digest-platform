@@ -21,6 +21,7 @@ export interface User extends CosmicObject {
   type: 'users';
   metadata: {
     email: string;
+    password: string;
     full_name: string;
     subscription_tier: {
       key: string;
@@ -157,6 +158,23 @@ export interface CreateUserData {
   timezone: Timezone;
   email_notifications: boolean;
   account_status: AccountStatus;
+}
+
+// Authentication types
+export interface LoginData {
+  email: string;
+  password: string;
+}
+
+export interface SignupData {
+  fullName: string;
+  email: string;
+  password: string;
+  digestDay: DigestDay;
+  digestTime: string;
+  timezone: Timezone;
+  emailNotifications: boolean;
+  subscriptionTier: SubscriptionTier;
 }
 
 // Type guards for runtime validation
