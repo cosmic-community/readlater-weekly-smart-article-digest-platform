@@ -1,102 +1,124 @@
 'use client';
 
 import { useState } from 'react';
-import { validateUrl } from '@/lib/utils';
+import { saveArticle } from '@/lib/cosmic';
+import LoadingSpinner from './LoadingSpinner';
 
-export default function AddArticleForm() {
+interface AddArticleFormProps {
+  userId: string;
+}
+
+export default function AddArticleForm({ userId }: AddArticleFormProps) {
   const [url, setUrl] = useState('');
-  const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [message, setMessage] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
-
+    
     if (!url.trim()) {
-      setError('Please enter a URL');
-      return;
-    }
-
-    if (!validateUrl(url)) {
-      setError('Please enter a valid URL');
+      setMessage('Please enter a valid URL');
       return;
     }
 
     setIsLoading(true);
-    
+    setMessage('');
+
     try {
-      // TODO: Implement API call to add article
-      console.log('Adding article:', url.trim());
+      // Basic URL validation
+      const urlPattern = /^https?:\/\/.+/;
+      if (!urlPattern.test(url)) {
+        throw new Error('Please enter a valid URL starting with http:// or https://');
+      }
+
+      // Extract domain from URL
+      const domain = new URL(url).hostname;
       
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // For demo purposes, we'll create a simple title from the URL
+      const title = url.split('/').pop() || domain;
       
-      // Clear form on success
+      const articleData = {
+        url: url.trim(),
+        title,
+        domain,
+        userId,
+        tags: [],
+        readStatus: 'unread' as const,
+        savedDate: new Date().toISOString().split('T')[0],
+        weekBatch: getWeekBatch()
+      };
+
+      await saveArticle(articleData);
+      setMessage('Article saved successfully!');
       setUrl('');
       
-      // Show success message or redirect
-      alert('Article added successfully!');
+      // Clear success message after 3 seconds
+      setTimeout(() => setMessage(''), 3000);
       
     } catch (error) {
-      console.error('Error adding article:', error);
-      setError('Failed to add article. Please try again.');
+      setMessage(error instanceof Error ? error.message : 'Failed to save article');
     } finally {
       setIsLoading(false);
     }
   };
 
+  const getWeekBatch = () => {
+    const now = new Date();
+    const year = now.getFullYear();
+    const week = Math.ceil((now.getTime() - new Date(year, 0, 1).getTime()) / (7 * 24 * 60 * 60 * 1000));
+    return `${year}-W${week.toString().padStart(2, '0')}`;
+  };
+
   return (
-    <div className="bg-white rounded-lg shadow-sm border p-6 mb-6">
-      <h2 className="text-lg font-semibold text-gray-900 mb-4">Add New Article</h2>
+    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+      <h2 className="text-lg font-semibold text-gray-900 mb-4">
+        Save New Article
+      </h2>
       
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label htmlFor="url" className="block text-sm font-medium text-gray-700 mb-2">
             Article URL
           </label>
-          <div className="relative">
-            <input
-              type="url"
-              id="url"
-              value={url}
-              onChange={(e) => setUrl(e.target.value)}
-              placeholder="https://example.com/article"
-              className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                error ? 'border-red-300' : 'border-gray-300'
-              }`}
-              disabled={isLoading}
-            />
-            {isLoading && (
-              <div className="absolute right-3 top-2.5">
-                <svg className="animate-spin h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-              </div>
-            )}
-          </div>
-          {error && (
-            <p className="text-red-600 text-sm mt-1">{error}</p>
-          )}
+          <input
+            type="url"
+            id="url"
+            value={url}
+            onChange={(e) => setUrl(e.target.value)}
+            placeholder="https://example.com/article"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            disabled={isLoading}
+          />
         </div>
 
         <button
           type="submit"
           disabled={isLoading || !url.trim()}
-          className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+          className="w-full flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {isLoading ? 'Adding Article...' : 'Add Article'}
+          {isLoading ? (
+            <>
+              <LoadingSpinner size="sm" className="mr-2" />
+              Saving...
+            </>
+          ) : (
+            'Save Article'
+          )}
         </button>
+
+        {message && (
+          <div className={`p-3 rounded-md text-sm ${
+            message.includes('successfully') 
+              ? 'bg-green-50 text-green-800 border border-green-200' 
+              : 'bg-red-50 text-red-800 border border-red-200'
+          }`}>
+            {message}
+          </div>
+        )}
       </form>
 
-      <div className="mt-4 p-3 bg-gray-50 rounded-lg">
-        <h3 className="text-sm font-medium text-gray-700 mb-2">How it works:</h3>
-        <ul className="text-sm text-gray-600 space-y-1">
-          <li>• Paste any article URL above</li>
-          <li>• We'll automatically extract the title, description, and image</li>
-          <li>• Articles are saved to your reading list for later</li>
-          <li>• You'll receive them in your weekly digest email</li>
-        </ul>
+      <div className="mt-4 text-xs text-gray-500">
+        <p>Tip: You can save articles from any website by pasting the URL above.</p>
       </div>
     </div>
   );
